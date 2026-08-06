@@ -6,6 +6,7 @@ import ComparisonsTab from "./components/ComparisonsTab";
 import CalculatorsTab from "./components/CalculatorsTab";
 import { TabPage } from "./types";
 import { X, LayoutDashboard, Percent, Calculator } from "lucide-react";
+import { trackPageView } from "./utils/analyticsTracker";
 
 export default function App() {
   const [hasEnteredApp, setHasEnteredApp] = useState<boolean>(false);
@@ -17,6 +18,14 @@ export default function App() {
   const handleTabChange = (tab: TabPage) => {
     setActiveTab(tab);
     setMobileMenuOpen(false);
+    
+    // Track page view for analytics
+    const tabLabels: Record<TabPage, string> = {
+      dashboard: 'DashboardTab',
+      comparisons: 'ComparisonsTab',
+      calculators: 'CalculatorsTab',
+    };
+    trackPageView(tabLabels[tab]);
   };
 
   const handleSelectCalculator = (calcName: string) => {

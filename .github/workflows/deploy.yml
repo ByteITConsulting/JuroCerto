@@ -35,6 +35,8 @@ jobs:
         run: npm test
 
       - name: Build with Vite
+        env:
+          VITE_GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
         run: npm run build
 
       - name: Upload artifact to GitHub Pages

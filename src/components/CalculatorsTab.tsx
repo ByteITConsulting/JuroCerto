@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Calculator, Percent, ShieldCheck, RefreshCw, HelpCircle, ArrowRight } from "lucide-react";
 import InputField from "./form/InputField";
+import { trackCalculatorUsage } from "../utils/analyticsTracker";
 
 interface CalculatorsTabProps {
   initialCalculator?: string;
@@ -48,11 +49,16 @@ export default function CalculatorsTab({ initialCalculator = "compound" }: Calcu
       contributions += monthly;
     }
 
-    setCompoundResult({
+    const result = {
       total: Math.round(total * 100) / 100,
       interest: Math.round((total - contributions) * 100) / 100,
       contributions,
-    });
+    };
+    
+    setCompoundResult(result);
+    
+    // Track calculator usage with result
+    trackCalculatorUsage('compound_interest', result.total);
   };
 
   // 2. Tax Equivalence Math
@@ -63,10 +69,15 @@ export default function CalculatorsTab({ initialCalculator = "compound" }: Calcu
     // CDB equivalent to LCI is LCI / (1 - taxRate)
     const netEquivalentCdbPercent = cdbRate / (1 - taxRateValue / 100);
 
-    setEquivalenceResult({
+    const result = {
       equivalentLci: netEquivalentLciPercent,
       equivalentCdb: netEquivalentCdbPercent,
-    });
+    };
+    
+    setEquivalenceResult(result);
+    
+    // Track calculator usage
+    trackCalculatorUsage('tax_equivalence', netEquivalentLciPercent);
   };
 
   // 3. Inflation Math
@@ -74,10 +85,15 @@ export default function CalculatorsTab({ initialCalculator = "compound" }: Calcu
     // Future value discounted by inflation rate p.a.
     // Real value = Nominal Amount / (1 + inflationRate/100)^years
     const realValue = nominalAmount / Math.pow(1 + inflationRate / 100, inflationYears);
-    setInflationResult({
+    const result = {
       realValue: Math.round(realValue * 100) / 100,
       loss: Math.round((nominalAmount - realValue) * 100) / 100,
-    });
+    };
+    
+    setInflationResult(result);
+    
+    // Track calculator usage
+    trackCalculatorUsage('inflation', result.realValue);
   };
 
   return (
